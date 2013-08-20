@@ -46,7 +46,14 @@ data type. The reason is that polymorphic arguments and constructor
 fields are assumed to be pointers, which unboxed types generally are
 not.
 
-Unboxed tuples 
+Unboxed tuples are used for functions that return multiple values. The
+syntax for unboxed tuples is as follows:
+
+~~~
+(# e_1, ... , e_n #)
+~~~
+
+where `e_1` ... `e_n` are expressions of any type, boxed or unboxed. 
 
 \TODO{inlining}
 
