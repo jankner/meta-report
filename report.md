@@ -51,19 +51,23 @@ Unboxed tuples
 \TODO{inlining}
 
 ## Loop fusion
+
 Loop fusion is an optimization where multiple loops are fused into a
-single loop. 
+single loop. \TODO{why?}
+
+In meta-repa loop fusion is not an optimization that is performed on
+the AST. Rather, the array representations and combinators in the
+library are defined so that loops are fused by default. For example,
+the `map` combinator for Pull arrays are defined using function
+composition with the indexing function.
 
 ~~~
 map f (map g xs)  ===
 map (f . g) xs
 ~~~
 
-In meta-repa loop fusion is not an optimization that is performed on
-the AST. Rather, the combinators in the array library are defined
-so that loops are fused by default. For example, the map combinator
-for Pull arrays are defined using function composition with the
-indexing function.
+Sometimes the programmer wants to prevent fusion. This can be done
+with the `force` function, which writes a delayed array to memory. 
 
 ## Template Haskell
 
