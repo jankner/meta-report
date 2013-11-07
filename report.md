@@ -37,9 +37,9 @@ language with the following ADT:
 
 ~~~
 data Expr = B Bool
-						I Int
-						If Expr Expr Expr
-						Plus Expr Expr
+					| I Int
+					| If Expr Expr Expr
+					| Plus Expr Expr
 ~~~
 
 Say we wish to write an evaluation function for our language. The
@@ -69,18 +69,31 @@ data Expr a where
 	B    :: Bool -> Expr Bool
 	I    :: Int -> Expr Int
 	If   :: Expr Bool -> Expr a -> Expr a -> Expr a
-	Plus :: Expr Int -> Expr Int
+	Plus :: Expr Int -> Expr Int -> Expr Int
 ~~~
 
-The type-variable `a` in this GADT is a so-called phantom type. It's
-called a phantom type because an `Expr a` doesn't contain `a`s like
-for example `[a]`. The type is only there to encode the result type of
-the expression.
+The type variable `a` here encodes the result type of the expression;
+`Expr Int` evaluates to an `Int`, `Expr Bool` evaluates to a `Bool`.
 
-Now that we the result type of the expression is encoded in the type
-of the expression we can write an evaluation function of with the
-type `Expr a -> a`. No need to check either the well-typedness or the
-result type of expression at runtime.
+Now that the result type of the expression is encoded in the type of
+the expression we can write an evaluation function with the type `Expr
+a -> a`. No need to check either the well-typedness or the result type
+of expression at runtime.
+
+~~~
+eval :: Expr a -> a
+eval (B b) = b
+eval (I i) = i
+eval (If a b c) = if eval a then eval b else eval c
+eval (Plus a b) = eval a + eval b
+~~~
+
+Here we see that the fact that we can give constructors custom types
+means that types can depend on what constructor we have pattern
+matched. In each equation of the function the return type depends on
+the constructor that is being matched. For example, in the equation
+for the `B` constructor the type checker knows from the type of `B`
+that the return type is `Bool` so we can safely return a `Bool`.
 
 As is often the case when we get more type-safety certain programs are
 somewhat more difficult to write. For example, if we want to parse a
