@@ -7,6 +7,16 @@
 
 	
 
+This thesis presents a new method for writing high-performance
+programs in Haskell based on embedded domain-specific lanaguages
+(EDSLs) and meta-programming. We write programs in an embedded
+language that is translated into efficient Haskell code at
+compile-time.
+
+The thesis also presents a case study to demonstrate the viability of
+the method. The case study is a library for parallell array
+computations called meta-repa. The library is based on the Haskell
+library repa.
 # Theory
 
 ## EDSL
