@@ -146,23 +146,67 @@ where `e_1` ... `e_n` are expressions of any type, boxed or unboxed.
 
 \TODO{inlining}
 
-## Loop fusion
+## Fusion
 
-Loop fusion is an optimization where multiple loops are fused into a
-single loop. \TODO{why?}
-
-In meta-repa loop fusion is not an optimization that is performed on
-the AST. Rather, the array representations and combinators in the
-library are defined so that loops are fused by default. For example,
-the `map` combinator for Pull arrays are defined using function
-composition with the indexing function.
+Fusion is a optimization where temporary data structures are removed
+by combining traversals. To demonstrate what this means and why we
+want to do it we will look at an example. The example uses lists
+rather than arrays since lists will be more familiar to Haskell
+programmers. The same points apply to arrays and other data
+structures.
 
 ~~~
-map f (map g xs)  ===
-map (f . g) xs
+map (*2) (map (+1) [1..100])
 ~~~
 
-Sometimes the programmer wants to prevent fusion. This can be done
+The naive way to evaluate this code is to first construct a list
+containg the numbers from 1 to 100, construct another list with 1
+added to each element, then a third list with each element multiplied
+by 2. So three different lists are constructed of which only one is
+actually used.  This is obviously very wasteful. What we would like to
+do is to combine all these computations into one pass that just
+constructs one list with the elements `(n+1)*2` for n 1 to
+100. We could achive that by defining the list like this:
+
+~~~
+l = f 1
+	where f n | n > 100   = []
+	          | otherwise = ((n+1)*2) : f (n-1)
+~~~
+
+But this is considerably less concise and readable. We would like to
+be able to write programs using reusable functions like `map` and
+`zipWith` while still avoiding unnecessary intermediate lists. Removing
+unnecessary temporary data structures is called in this way is called
+fusion or deforestation.
+
+\TODO{background on deforestation?}
+
+In meta-repa fusion is not an optimization that is performed as a
+program transformation. Rather, the array representations and
+combinators in the library are defined so that no unnecessary
+intermediate arrays are created to begin with.  For example, Pull
+arrays are represented as a function from an index to a value.
+Combinators on Pull arrays combine the indexing functions and other
+function. For example the `map` function on Pull arrays combines the
+indexing function of the input with the function to map with: 
+
+~~~
+map f (Pull ixf n) = Pull (f . ixf) n
+~~~
+
+So we build up the indexing function bit by bit with the Pull array
+combinators and then we do the actual traversal of the array when it
+is needed. When writing the the array to memory for example.
+
+\TODO{Example}
+~~~
+
+~~~
+
+Sometimes the programmer wants to prevent fusion if, for example,
+elements in the array are accessed multiple time, since that would
+cause those elements to be computed multiple times. This can be done
 with the `force` function, which writes a delayed array to memory. 
 
 ## Template Haskell
