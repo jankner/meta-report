@@ -112,6 +112,73 @@ into something like our first representation and then make a function
 which type checks the expression and generates the type-safe
 representation of the expression if the type checking succeeds.
 
+## Higher-order abstract syntax
+
+Higher-order abstract syntax is a technique for representing bindings
+in the object language using function values in the abstract syntax.
+By doing this we reuse the notion of binding, variables and
+substitution of the meta-language instead of re-implementing them. 
+
+As a motivating example we will see what happens when we try to extend
+the language in the previous section with lambda calculus constructs
+to make a simply typed lambda calculus. We start by adding constructs
+for abstractions, application and variables to the untyped
+representation:
+
+~~~
+          | Var Name
+          | App Expr Expr
+          | Abs Name Expr
+~~~
+
+This is quite straight-forward, although when writing the `eval`
+function we need to implement substitution or keep an environment to
+keep track of variables.
+
+Things get more troublesome when we try to do the same thing in the
+GADT representation. The reason is that is difficult to give a type to
+variables since there is no explicit connection between the variable's
+binding site and it's uses. They are only connected by the name of the
+variable. One way to solve this is to use a type-level list to keep
+track of the types of variables in the environment. Variables are
+represented using De Bruijn indices encoded as Peano numbers which are
+used to index into the environment. \TODO{reference}
+
+But there is a simpler solution to these problems: higher-order
+abstract syntax (HOAS). Using HOAS to add lambda calculus to the typed
+representation from the previous section looks like this:
+
+~~~
+  App :: Expr (a -> b) -> Expr a -> Expr b
+  Abs :: (Expr a -> Expr b) -> Expr (a -> b)
+  Val :: a -> Expr a
+~~~
+
+Abstractions are represented by a function in the meta-language.
+Instead of having a variable constructor we use the variables of the
+meta-language. For example the expression `\x -> x + 10` is
+represented like this:
+
+~~~
+Abs (\x -> Plus x (I 10))
+~~~
+
+In short lambda abstractions are represented with a function that
+takes an expression as argument and returns the body of the
+abstraction with the variable substituted by the argument.
+
+The `eval` function is quite straight-forward:
+
+~~~
+eval (App f a) = (eval f) (eval a)
+eval (Abs f) = \x -> eval (f (Val x))
+eval (Val x) = x
+~~~
+
+The `Val` constructor is only used during so we have a way to
+substitute a value into an abstraction.
+
+
 ## Unboxed types
 
 Most types in GHC have a boxed representation, which means that they
