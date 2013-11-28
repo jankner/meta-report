@@ -205,7 +205,7 @@ is needed. When writing the the array to memory for example.
 ~~~
 
 Sometimes the programmer wants to prevent fusion if, for example,
-elements in the array are accessed multiple time, since that would
+elements in the array are accessed multiple times, since that would
 cause those elements to be computed multiple times. This can be done
 with the `force` function, which writes a delayed array to memory. 
 
