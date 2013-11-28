@@ -47,9 +47,9 @@ language with the following ADT:
 
 ~~~
 data Expr = B Bool
-					| I Int
-					| If Expr Expr Expr
-					| Plus Expr Expr
+          | I Int
+          | If Expr Expr Expr
+          | Plus Expr Expr
 ~~~
 
 Say we wish to write an evaluation function for our language. The
@@ -76,10 +76,10 @@ language.
 
 ~~~
 data Expr a where
-	B    :: Bool -> Expr Bool
-	I    :: Int -> Expr Int
-	If   :: Expr Bool -> Expr a -> Expr a -> Expr a
-	Plus :: Expr Int -> Expr Int -> Expr Int
+  B    :: Bool -> Expr Bool
+  I    :: Int -> Expr Int
+  If   :: Expr Bool -> Expr a -> Expr a -> Expr a
+  Plus :: Expr Int -> Expr Int -> Expr Int
 ~~~
 
 The type variable `a` here encodes the result type of the expression;
@@ -170,8 +170,8 @@ constructs one list with the elements `(n+1)*2` for n 1 to
 
 ~~~
 l = f 1
-	where f n | n > 100   = []
-	          | otherwise = ((n+1)*2) : f (n-1)
+  where f n | n > 100   = []
+            | otherwise = ((n+1)*2) : f (n-1)
 ~~~
 
 But this is considerably less concise and readable. We would like to
