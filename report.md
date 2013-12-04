@@ -281,8 +281,8 @@ with the `force` function, which writes a delayed array to memory.
 
 ## Template Haskell
 
-Template Haskell is a compiler extension that allows template
-metaprogramming in Haskell. The programmer writes a program that
+Template Haskell is a compiler extension that allows compile-time
+metaprogramming in Haskell. The programmer writes a program which
 is run at compile-time and generates a Haskell AST which can be
 inserted (spliced) into a Haskell program.
 
