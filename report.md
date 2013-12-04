@@ -178,7 +178,7 @@ eval (Abs f) = \x -> eval (f (Val x))
 eval (Val x) = x
 ~~~
 
-The `Val` constructor is only used during so we have a way to
+The `Val` constructor is only used during evaluation so we have a way to
 substitute a value into an abstraction.
 
 
