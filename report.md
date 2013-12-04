@@ -212,7 +212,20 @@ syntax for unboxed tuples is as follows:
 (# e_1, ... , e_n #)
 ~~~
 
-where `e_1` ... `e_n` are expressions of any type, boxed or unboxed. 
+where `e_1` ... `e_n` are expressions of any type, boxed or unboxed.
+Unboxed tuples have all the restrictions that unboxed types have. In
+addition unboxed tuples cannot be bound to a variable and it cannot be
+passed as an argument to a function. They can essentially only be used
+to return multiple values.
+
+For performance reasons we want to use unboxed values for all
+primitive types and tuples in the meta-repa code generator. For this
+reason the semantics of the core language is strict since unboxed
+values are strict. Also, terms in the language are monomorphic. Note
+that we can still write polymorphic code generators in Haskell, so we
+can still write polymorpic with meta-repa. This is similar to how
+templates work in C++; the polymorpism only exists at compile-time.
+
 
 \TODO{inlining}
 
