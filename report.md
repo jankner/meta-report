@@ -103,7 +103,10 @@ means that types can depend on what constructor we have pattern
 matched. In each equation of the function the return type depends on
 the constructor that is being matched. For example, in the equation
 for the `B` constructor the type checker knows from the type of `B`
-that the return type is `Bool` so we can safely return a `Bool`.
+that the return type is `Bool` so we can safely return a `Bool`. The
+fact that the return value of `eval` isn't tagged also simplifies it's
+implementation since it doesn't have to do any checks when it calls
+itself to see that the result has the right type.
 
 As is often the case when we get more type-safety certain programs are
 somewhat more difficult to write. For example, if we want to parse a
