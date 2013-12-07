@@ -295,12 +295,37 @@ with the `force` function, which writes a delayed array to memory.
 ## Template Haskell
 
 Template Haskell is a compiler extension that allows compile-time
-metaprogramming in Haskell. The programmer writes a program which
-is run at compile-time and generates a Haskell AST which can be
-inserted (spliced) into a Haskell program.
+meta-programming in Haskell. That is, it is used to write Haskell code
+that generates Haskell code in the form of an AST. The generated
+Haskell code can be inserted into a program at compile-time. This is
+called splicing and is written `$( ... )`, where `...` is a Haskell
+expression that generates an AST. The expression is evaluated by the
+compiler while it is compiling the module. Because it is evaluated at
+compile-time any functions used in the expression must be defined in
+a seperate module, so that it can be compiled before the current
+module. Splices can be occur in place of an expression, a type or
+a list of top-level declarations.
 
 The meta-repa core language is translated into Haskell using Template
-Haskell...
+Haskell and inserted using splices.
+
+A splice can be said to allow the programmer to go from abstract
+syntax to concrete syntax. Template Haskell also has quasi-quotation
+which allows the programmer to go from concrete syntax to abstract
+syntax. Quasi-quotation is written as `[| ... |]` where `...` is
+a Haskell expression (in concrete syntax,) and the result is an AST of
+that expression. There is also quasi-quotations for declarations,
+types and patterns.
+
+Template Haskell also allows programmer-defined quasi-quoters.
+A programmer-defined quasi-quoter is used by writing `[quoter| ... |]`
+where `quoter` is the name of the quasi-quoter. The quasi-quoter is
+a collection of functions that parses a string and generates a Haskell
+AST, which is inserted in place of the quasi-quotation. This allows
+for programmer-defined concrete syntax, which can make programs easier
+to read and write. [@mainland2007quoted] Quasi-quotation is used in
+meta-repa to specify stencil computations.
 
 
+# References
 
