@@ -294,10 +294,33 @@ So we build up the indexing function bit by bit with the Pull array
 combinators and then we do the actual traversal of the array when it
 is needed. When writing the the array to memory for example.
 
-\TODO{Example}
-~~~
+To see how this works, consider a program to calculate the scalar
+product of two arrays, `arr1` and `arr2`. The arrays are defined as
+`Pull ixf1 n1` and `Pull ixf2 n2` respectively. `scalarProd` is defined as:
 
 ~~~
+scalarProd a b = sumS (zipWith (*) a b)
+~~~
+
+Conceptually `zipWith` produces a temporary array which is then
+consumed by `sumS`. But as we will see this temporary array is reduced
+away through normal Haskell evaluation when the abstract syntax tree
+is generated. For the sake of simplicity of this example Pull arrays
+are one-dimensional rather than shape polymorphic, and `forLoop` has
+been treated as if it is a primitive of the core-language which it
+is not in meta-repa.
+
+~~~
+   scalarProd arr1 arr2
+=> sumS (zipWith (*) arr1 arr2)
+=> sumS (zipwith (*) (Pull ixf1 n1) (Pull ixf2 n2)
+=> sumS (Pull (\i -> ixf1 i * ixf2 i) (min n1 n2))
+=> forLoop (min n1 n2) 0 (\i s -> s + ixf1 i * ixf2 i)
+~~~
+
+First the two input arrays disappear and is combined into one array,
+and in the last step no arrays remain and we simply get a loop that
+computes the scalar product. 
 
 Sometimes the programmer wants to prevent fusion if, for example,
 elements in the array are accessed multiple times, since that would
