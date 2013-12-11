@@ -5,13 +5,20 @@
 
 # Introduction
 
-	
+Doing high-performance programming in Haskell can be a somewhat
+painful. Lazy evaluation and boxed representations are the default,
+and the overhead associated with this can be disastrous for
+performance in many cases. The programmer has to take steps to avoid
+laziness and to make sure that inlining of certain functions in order
+to triggering certain optimization in GHC. This can be easy to get
+wrong, and performance bugs can be hard to find and fix.
 
 This thesis presents a new method for writing high-performance
 programs in Haskell based on embedded domain-specific lanaguages
-(EDSLs) and meta-programming. We write programs in an embedded
-language that is translated into efficient Haskell code at
-compile-time.
+(EDSLs) and meta-programming. Programs are written in an embedded
+language that is translated into Haskell code at compile-time. The
+code generation is done in a way to give efficiency guarantees for
+programs written in the EDSL.
 
 The thesis also presents a case study to demonstrate the viability of
 the method. The case study is a library for parallell array
