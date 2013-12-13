@@ -371,7 +371,21 @@ module. Splices can be occur in place of an expression, a type or
 a list of top-level declarations.
 
 The meta-repa core language is translated into Haskell using Template
-Haskell and inserted using splices.
+Haskell and inserted using splices. For example, if we have
+a meta-repa program in one module:
+
+~~~
+Expr Int -> Expr Int
+f n = sumS (enumFromTo 1 n)
+~~~
+
+we can translate this program and splice the result into another
+module like this:
+
+~~~
+sumN :: Int -> Int
+sumN = $( translate f )
+~~~
 
 A splice can be said to allow the programmer to go from abstract
 syntax to concrete syntax. Template Haskell also has quasi-quotation
