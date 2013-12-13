@@ -25,21 +25,44 @@ The thesis also presents a case study to demonstrate the viability of
 the method. The case study is a library for parallell array
 computations called meta-repa. The library is based on the Haskell
 library repa.
-# Theory
 
-## EDSL
+## Embedded Domain-Specific Languages
 
-A Domain Specific Language (DSL) is a language that is tailored to a
-specific domain. Examples of DSLs: SQL for relational database
-queries, ...
+A Domain-Specific Language (DSL) is a language that is focused on
+solving problems in particular domain. Examples of DSLs: SQL for
+relational database queries, VHDL and Verilog for hardware design,
+TeX for for typesetting.
 
+Among other benefits using a DSL allows for domain-specific
+abstractions, domain-specific optimization and having semantics that
+are suited to the domain. For these reasons, among others, DSLs can
+often be more concise, easier to write and understand, and more
+efficient in their domain than a general purpose language. 
 
 An Embedded DSL (EDSL) is a DSL that is embedded into a general
-purpose language as a library. 
+purpose language as a library. This saves us the work of designinging
+and implementing an entire language; we borrow much of the
+functionality (syntax, type system, etc.) from the host language.
+An EDSL can be divided into four sorts of constituent:
 
-\TODO{explain shallow vs deep embedding?}
+* a set of types to represent concepts of the domain.
+* constructor function to create elements of these types.
+* combinator functions to combine and modify elements.
+* run functions to make obeservations on elements.
 
-\TODO{monomorphic/strict}
+There are two major techniques for embedding languages; shallow
+embedding and deep embedding. Deep embedding means that there is
+something like an abstract syntax tree which is then interpreted in
+a run-function. In shallow embedding most of the work is done by the
+combinators and constructors of the language and the run-function
+only extracts the result.
+
+meta-repa uses both shallow and deep embedding. It has a core language
+that is deeply embedded. The arrays that users of the library use are a
+shallow embedding that is built on top of the core language.
+
+# Theory
+
 
 ## Generalized algebraic data types
 
