@@ -9,9 +9,10 @@ Doing high-performance programming in Haskell can be a somewhat
 painful. Lazy evaluation and boxed representations are the default,
 and the overhead associated with this can be disastrous for
 performance in many cases. The programmer has to take steps to avoid
-laziness and to make sure that inlining of certain functions in order
-to triggering certain optimization in GHC. This can be easy to get
-wrong, and performance bugs can be hard to find and fix.
+laziness and to make sure that inlining of certain functions is
+performed in order to triggering certain optimization in GHC. This can
+be easy to get wrong, and can give rise to performance bugs that are
+hard to find and fix.
 
 This thesis presents a new method for writing high-performance
 programs in Haskell based on embedded domain-specific lanaguages
