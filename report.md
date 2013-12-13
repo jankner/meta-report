@@ -173,10 +173,8 @@ Things get more troublesome when we try to do the same thing in the
 GADT representation. The reason is that is difficult to give a type to
 variables since there is no explicit connection between the variable's
 binding site and it's uses. They are only connected by the name of the
-variable. One way to solve this is to use a type-level list to keep
-track of the types of variables in the environment. Variables are
-represented using De Bruijn indices encoded as Peano numbers which are
-used to index into the environment. \TODO{reference}
+variable. There is a solution to this, but it requires some type-level
+programming and is relatively complicated. \TODO{reference}
 
 But there is a simpler solution to these problems: higher-order
 abstract syntax (HOAS). Using HOAS to add lambda calculus to the typed
