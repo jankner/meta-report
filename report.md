@@ -10,7 +10,7 @@ painful. Lazy evaluation and boxed representations are the default,
 and the overhead associated with this can be disastrous for
 performance in many cases. The programmer has to take steps to avoid
 laziness and to make sure that inlining of certain functions is
-performed in order to triggering certain optimization in GHC. This can
+performed in order to trigger certain optimization in GHC. This can
 be easy to get wrong, and can give rise to performance bugs that are
 hard to find and fix.
 
