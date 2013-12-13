@@ -29,9 +29,9 @@ library repa.
 ## Embedded Domain-Specific Languages
 
 A Domain-Specific Language (DSL) is a language that is focused on
-solving problems in particular domain. Examples of DSLs: SQL for
-relational database queries, VHDL and Verilog for hardware design,
-TeX for for typesetting.
+solving problems in particular domain. Some examples of well-known
+DSLs are: SQL for relational database queries, VHDL and Verilog for
+hardware design, TeX for for typesetting.
 
 Among other benefits using a DSL allows for domain-specific
 abstractions, domain-specific optimization and having semantics that
