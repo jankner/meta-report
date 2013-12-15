@@ -26,6 +26,12 @@ the method. The case study is a library for parallell array
 computations called meta-repa. The library is based on the Haskell
 library repa.
 
+This masters's thesis has an unusual structure. The main content is
+a research article that was published in Haskell Symposium 2013, and
+was co-written with my supervisor Josef Svenningsson. The first chapters
+are devoted to explaining some basic concepts that will be used in the
+article. The article itself makes up appendix A.
+
 ## Embedded Domain-Specific Languages
 
 A Domain-Specific Language (DSL) is a language that is focused on
