@@ -151,7 +151,8 @@ representation of the expression if the type checking succeeds.
 Higher-order abstract syntax is a technique for representing bindings
 in the object language using function values in the abstract syntax.
 By doing this we reuse the notion of binding, variables and
-substitution of the meta-language instead of re-implementing them. 
+substitution of the meta-language instead of re-implementing them.
+[@pfenning1988higher]
 
 As a motivating example we will see what happens when we try to extend
 the language in the previous section with lambda calculus constructs
@@ -174,7 +175,7 @@ GADT representation. The reason is that is difficult to give a type to
 variables since there is no explicit connection between the variable's
 binding site and it's uses. They are only connected by the name of the
 variable. There is a solution to this, but it requires some type-level
-programming and is relatively complicated. \TODO{reference}
+programming and is relatively complicated. [@benton2012strongly]
 
 But there is a simpler solution to these problems: higher-order
 abstract syntax (HOAS). Using HOAS to add lambda calculus to the typed
