@@ -67,6 +67,92 @@ meta-repa uses both shallow and deep embedding. It has a core language
 that is deeply embedded. The arrays that users of the library use are a
 shallow embedding that is built on top of the core language.
 
+## High-performance programming in Haskell
+
+Let us look closer at high-performance programming in Haskell and some
+of it's pitfalls. As an example, let's write a function for computing
+the sum of a list of numbers and use it to add a million integers:
+
+~~~
+sum [] = 0
+sum (x:xs) = x + sum xs
+
+main = print (sum [1..1000000])
+~~~
+
+When we run this program we get the following output:
+
+~~~
+Stack space overflow: current size 8388608 bytes.
+~~~
+
+We get stack overflow because each recursive call of `sum` requires
+a stack frame to be allocated. A stack frame is required for the
+function to remember it's state when it calls itself (or another
+function). But if calling itself is that last thing the function does
+it does not need to keep track of anything since there nothing left to
+do. A function like this is said to be tail recursive. We can rewrite
+`sum` to be tail recursive like this:
+
+~~~
+sum = sum' 0
+  where sum' s []     = s
+        sum' s (x:xs) = sum' (s+x) xs
+~~~
+
+When we run our program with the new `sum` function we find that we
+still encounter the same problem:
+
+~~~
+Stack space overflow: current size 8388608 bytes.
+~~~
+
+The problem is that Haskell is a lazy language, which means that
+arguments are not evaluated before they are passed to a function; they
+are only evaluated when they are needed. So the first argument of `sum'`
+accumulates a growing computation as the list is consumed. When the
+value of the sum is needed the entire computation is performed. For
+example, evaluating the expression `sum [1,2,3,4]` will look like
+this:
+
+~~~
+sum [1,2,3,4]
+=> sum' 0 [1,2,3,4]
+=> sum' (0+1) [2,3,4]
+=> sum' ((0+1)+2) [3,4]
+=> sum' (((0+1)+2)+3) [4]
+=> sum' ((((0+1)+2)+3)+4) []
+=> ((((0+1)+2)+3)+4)
+=> (((1+2)+3)+4)
+=> ((3+3)+4)
+=> (6+4)
+=> 10
+~~~
+
+Besides causing stack overflow for large lists building up this
+computation and then immediately performing it is quite inefficient. To
+prevent this we want to make the accumulator strict. We can do this by
+using a bang pattern like this:
+
+~~~
+sum = sum' 0
+  where sum' !s []     = s
+        sum' !s (x:xs) = sum (s+x) xs
+~~~
+
+Now when we run our program we get the expected result:
+
+~~~
+500000500000
+~~~
+
+This is, of course, a very simple example and the performance problems
+are quite easily solved. Also, in such a simple case GHC's strictness
+analyzer can see that the result of `sum'` is consumed immediately and
+automatically make the accumulator strict. But the strictness analysis
+is not guaranteed to work for every program, and for more complicated
+programs it gets easier to make mistakes.
+
 # Theory
 
 
