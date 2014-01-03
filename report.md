@@ -343,13 +343,11 @@ to return multiple values.
 For performance reasons we want to use unboxed values for all
 primitive types and tuples in the meta-repa code generator. For this
 reason the semantics of the core language is strict since unboxed
-values are strict. Also, terms in the language are monomorphic. Note
-that we can still write polymorphic code generators in Haskell, so we
-can still write polymorpic with meta-repa. This is similar to how
-templates work in C++; the polymorpism only exists at compile-time.
-
-
-\TODO{inlining}
+values are strict. Also, terms in the language are monomorphic;
+unboxed values do not support polymorphism. Note that we can still
+write polymorphic code generators in Haskell, so we can still write
+polymorpic with meta-repa. This is similar to how templates work in
+C++; the polymorpism only exists at compile-time.
 
 ## Fusion
 
