@@ -412,14 +412,20 @@ map f (Pull ixf n) = Pull (f . ixf) n
 
 So we build up the indexing function bit by bit with the Pull array
 combinators and then we do the actual traversal of the array when it
-is needed. When writing the the array to memory for example.
+is needed. When writing the array to memory for example.
 
 To see how this works, consider a program to calculate the scalar
 product of two arrays, `arr1` and `arr2`. The arrays are defined as
-`Pull ixf1 n1` and `Pull ixf2 n2` respectively. `scalarProd` is defined as:
+`Pull ixf1 n1` and `Pull ixf2 n2` respectively. `scalarProd`, `zipWith` and
+`sumS` is defined as follows is defined as:
 
 ~~~
 scalarProd a b = sumS (zipWith (*) a b)
+
+zipWith f (Pull ixf1 n1) (Pull ixf2 n2) =
+	Pull (\i -> ixf1 i `f` ixf2 i) (min n1 n2)
+
+sumS (Pull ixf n) = forLoop n (\i s -> s + ixf i)
 ~~~
 
 Conceptually `zipWith` produces a temporary array which is then
