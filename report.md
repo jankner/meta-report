@@ -139,7 +139,7 @@ shallow embedding that is built on top of the core language.
 ## High-performance programming in Haskell
 
 Let us look closer at high-performance programming in Haskell and some
-of it's pitfalls. As an example, let's write a function for computing
+of its pitfalls. As an example, let's write a function for computing
 the sum of a list of numbers and use it to add a million integers:
 
 ~~~
@@ -157,7 +157,7 @@ Stack space overflow: current size 8388608 bytes.
 
 We get stack overflow because each recursive call of `sum` requires
 a stack frame to be allocated. A stack frame is required for the
-function to remember it's state when it calls itself (or another
+function to remember its state when it calls itself (or another
 function). But if calling itself is that last thing the function does
 it does not need to keep track of anything since there nothing left to
 do. A function like this is said to be tail recursive. We can rewrite
@@ -296,7 +296,7 @@ matched. In each equation of the function the return type depends on
 the constructor that is being matched. For example, in the equation
 for the `B` constructor the type checker knows from the type of `B`
 that the return type is `Bool` so we can safely return a `Bool`. The
-fact that the return value of `eval` isn't tagged also simplifies it's
+fact that the return value of `eval` isn't tagged also simplifies its
 implementation since it doesn't have to do any checks when it calls
 itself to see that the result has the right type.
 
@@ -334,7 +334,7 @@ keep track of variables.
 Things get more troublesome when we try to do the same thing in the
 GADT representation. The reason is that is difficult to give a type to
 variables since there is no explicit connection between the variable's
-binding site and it's uses. They are only connected by the name of the
+binding site and its uses. They are only connected by the name of the
 variable. There is a solution to this, but it requires some type-level
 programming and is relatively complicated. [@benton2012strongly]
 
