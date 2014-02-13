@@ -455,16 +455,17 @@ fusion or deforestation.
 Deforestation was first introduced in [@wadler1990deforest]. The
 deforestation algorithm described in the paper is able to remove all
 intermediate structures, with the restriction that the program is in
-so-called *treeless form*. This is quite a restrictive form, so the
-algorithm has not had great use in practice. A different approach was
-used in [@gill93ashort]. The transformation isn't guaranteed to remove
-*all* intermediate structure, but it is much simpler and doesn't put
-any restriction on the programs it can take as input. The approach is
-to have a single, simple and local rule for rewriting the combination
-of two pre-define functions: `build` and `foldr`. If lists are
-produced with `build` and consumed with `foldr` that one
-transformation is enough to remove all intermediate lists, though of
-course not all programs can be written in this way.
+so-called *treeless form*. This is quite a restrictive form, and the
+algorithm is fairly complicated to implement and has some other
+problems, so it has not seen great use in practice. A different
+approach was used in [@gill93ashort]. The transformation isn't
+guaranteed to remove *all* intermediate structure, but it is much
+simpler and doesn't put any restriction on the programs it can take as
+input. The approach is to have a single, simple and local rule for
+rewriting the combination of two pre-define functions: `build` and
+`foldr`. If lists are produced with `build` and consumed with `foldr`
+that one transformation is enough to remove all intermediate lists,
+though of course not all programs can be written in this way.
 
 In meta-repa fusion is not an optimization that is performed as a
 program transformation. Rather, the array representations and
