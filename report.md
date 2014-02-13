@@ -56,12 +56,81 @@ An EDSL can be divided into four sorts of constituent:
 * combinator functions to combine and modify elements.
 * run functions to make obeservations on elements.
 
+### Deep vs. shallow embedding
+
 There are two major techniques for embedding languages; shallow
-embedding and deep embedding. Deep embedding means that there is
-something like an abstract syntax tree which is then interpreted in
-a run-function. In shallow embedding most of the work is done by the
-combinators and constructors of the language and the run-function
-only extracts the result.
+embedding and deep embedding. In a shallow embedding elements are
+represented by their semantics, the observations that can be done on
+them. In a deep embedding the elements are represented by their
+syntax, how they are constructed.
+
+To demonstrate the difference between deep and shallow embedding we
+will look at a simple EDSL for defining regions on a plane, and show
+how it can be implemented as either a deep or shallow embedding. The
+EDSL has the following interface:
+
+~~~
+type Point = (Float,Float)
+
+inRegion :: Point -> Region -> Bool
+circle :: Float -> Region
+outside :: Region -> Region
+(\/) :: Region -> Region -> Region
+(/\) :: Region -> Region -> Region
+~~~
+
+The EDSL contains two types: `Point` and `Region`. `Region` has been
+left abstract for now. It as one constructor: `circle`; three
+combinators `outside`, `\/` and `/\`; and one run-function:
+`inRegion`. First we will look at what the shallow embedding looks
+like:
+
+~~~
+newtype Region = Region (Point -> Bool)
+
+circle r = Region (\p -> magnitude p <= r)
+outside (Region f) = Region (not . f)
+(Region f1) \/ (Region f2) = Region (\p -> f1 p || f2 p)
+(Region f1) /\ (Region f2) = Region (\p -> f1 p && f2 p)
+
+inRegion p (Region f) = f p
+~~~
+
+A region is simply represented by a function that takes a point and
+tells you if it's inside the region. In other words, it is represented
+directly by the observation we want to do on it. Most of the work is
+done in the combinators and constructors which build up the function,
+and the run function simply calls the function. Next we will look at
+what a deep embedding looks like:
+
+~~~
+data Region 
+	= Circle Float
+	| Outside Region
+	| Union Region Region
+	| Intersect Region Region
+
+circle = Circle
+outside = Outside
+(\/) = Union
+(/\) = Intersect
+
+inRegion p (Circle r) = magnitude p <= r
+inRegion p (Outside r) = not (inRegion p r)
+inRegion p (Union r1 r2) = inRegion r1 || inRegion r2
+inRegion p (Intersect r1 r2) = inRegion r1 && inRegion r2
+~~~
+
+The `Region` type now has a case for each of the constructors and
+combinators on the language. It is represented by how the region was
+constructed. The work of determining if a point is in a region is done
+in the run function.
+
+Shallow embeddings are simpler and more efficient than deep
+embeddings, so it's a good choice if there is an obvious semantics for
+the language. The advantage to using a deep embedding is that it's
+easier to add run functions to and language and to do optimizations or
+other transformation.
 
 meta-repa uses both shallow and deep embedding. It has a core language
 that is deeply embedded. The arrays that users of the library use are a
