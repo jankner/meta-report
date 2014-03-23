@@ -1,4 +1,3 @@
-\newcommand{\TODO}[1]{\(\spadesuit\){\bf TODO:} {\bf \color{red} #1}\\}
 % Meta-repa
 % Johan Ankner
 %
@@ -572,5 +571,4 @@ to read and write. [@mainland2007quoted] Quasi-quotation is used in
 meta-repa to specify stencil computations.
 
 
-# References
 
