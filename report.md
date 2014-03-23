@@ -64,9 +64,9 @@ them. In a deep embedding the elements are represented by their
 syntax, how they are constructed.
 
 To demonstrate the difference between deep and shallow embedding we
-will look at a simple EDSL for defining regions on a plane, and show
-how it can be implemented as either a deep or shallow embedding. The
-EDSL has the following interface:
+will look at a simple EDSL from [@carlson1993experiment] for defining
+regions on a plane, and show how it can be implemented as either
+a deep or shallow embedding. The EDSL has the following interface:
 
 ~~~
 type Point = (Float,Float)
