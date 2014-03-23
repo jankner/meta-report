@@ -25,11 +25,13 @@ the method. The case study is a library for parallell array
 computations called meta-repa. The library is based on the Haskell
 library repa.
 
-This masters's thesis has an unusual structure. The main content is
-a research article that was published in Haskell Symposium 2013, and
-was co-written with my supervisor Josef Svenningsson. The first chapters
-are devoted to explaining some basic concepts that will be used in the
-article. The article itself makes up appendix A.
+This master's thesis has an unusual structure. The main content is
+a research paper that was published in Haskell Symposium 2013, and
+was co-written with my supervisor Josef Svenningsson. The first two
+chapters are devoted to explaining some basic concepts that will be
+used in the paper. The third chapter describes some features of
+meta-repa that were not included in the paper. The paper itself makes
+up appendix A.
 
 ## Embedded Domain-Specific Languages
 
@@ -523,6 +525,7 @@ cause those elements to be computed multiple times. This can be done
 with the `force` function, which writes a delayed array to memory. 
 
 ## Template Haskell
+\label{sec:th}
 
 Template Haskell is a compiler extension that allows compile-time
 meta-programming in Haskell. That is, it is used to write Haskell code
@@ -559,7 +562,9 @@ which allows the programmer to go from concrete syntax to abstract
 syntax. Quasi-quotation is written as `[| ... |]` where `...` is
 a Haskell expression (in concrete syntax), and the result is an AST of
 that expression. There is also quasi-quotations for declarations,
-types and patterns.
+types and patterns. Quasi-quotations and splices can be nested arbitrarily
+deep; a quasi-quotation can have a splice inside it, which can have
+a quasi-quotation inside it, and so on.
 
 Template Haskell also allows programmer-defined quasi-quoters.
 A programmer-defined quasi-quoter is used by writing `[quoter| ... |]`
@@ -570,5 +575,188 @@ for programmer-defined concrete syntax, which can make programs easier
 to read and write. [@mainland2007quoted] Quasi-quotation is used in
 meta-repa to specify stencil computations.
 
+
+# Stuff
+\TODO{ think of a proper title}
+
+## Manifest arrays
+
+Manifest arrays are on of the array types in meta-repa. They are not
+described in the article, so I will describe them briefly here.
+Manifest arrays represent arrays that are stored in memory, unlike
+Push and Pull arrays which represent computations of arrays. This
+means that the computation of the Manifest array is not fused with
+any computation that done with it after.
+
+## Compiling things
+\TODO{ think of a proper title}
+
+As shown in \ref{sec:programming}, it is simple to use meta-repa
+functions work with types like `Float` and `Int` and tuples and flat
+arrays since they are built into the core language. Using the
+`Computable` type class types like `(Expr a, Expr b)` and `Expr a ->
+Expr b` are translated into `Expr (a,b)` and `Expr (a -> b)`. The
+associated type `Internal` specifies what type a `Computable` is
+translated to; a `Computable` type `a` is translated into `Expr
+(Internal a)`. For example, `Internal (Expr a -> Expr b)` is `a -> b`,
+and `Internal (Expr a, (Expr b, Expr c))` is `(a,(b,c))`.
+
+But what do you do if, for example, you wish to use a function that
+transposes a matrix? Such a function would be natural to write as
+a meta-repa function of with the type `Manifest DIM2 Float -> Manifest
+DIM2 Float`.
+
+~~~
+transposeP :: Manifest DIM2 Float -> Manifest DIM2 Float
+transposeP arr = ...
+~~~
+
+Like the other array types `Manifest` isn't a type in the core
+language, so we cannot simply take this function and compile it. We
+can wrap the function so that `Manifest DIM2 Float` is translated into
+`(Expr (Vector Float), Expr Int, Expr Int)`, and this could even be
+automated if we wrote a `Computable` instance to do it. But when we
+compile this into Haskell we get a function with the type `(Vector
+Float, Int, Int) -> (Vector Float, Int, Int)`, which is less than
+ideal. It would be nice if we could also wrap it into a more
+meaningful type. Repa's unboxed array type `Array U` fits well for
+this job as it uses `Vector` internally. Of course we alo want to do
+all this converting and wrapping automatically and hide it behind
+a simple interface. `Computable` can't do the work of wrapping the
+compiled program, so we will solve the problem with a new type class
+called `Compilable`. The class will need one function that converts
+a value of the type into a `Computable`. It will also need a function
+to wrap the compiled value.
+
+~~~
+class Computable (GenTy a) => Compilable a where
+  type GenTy a
+  type External a
+  compile :: a -> GenTy a
+  reconstruct :: Proxy a -> Internal (GenTy a) -> External a
+  proxyOf :: a -> Proxy a
+~~~
+
+Computable value -> `compile` -> Computable value -> `translateComputable` -> TH expression -> splice -> `reconstruct` -> External representation
+
+The associated type `GenTy a` gives the type `a` gets converted into.
+The associated type `External a` is the external Haskell type that `a`
+will be compiled to. The function `compile` has a somewhat misleading
+name since it doesn't actually do compilation; it only converts its
+input into a form that can be compiled. `reconstruct` is used to wrap
+the compiled expression into the external representation. It takes an
+argument of type `Internal (GenTy a)`. `Internal` is an associated
+type of `Computable`, and it is used here to translate the
+`Computable`'s type into the Haskell type it will compile into. For
+example, `Internal (Expr a)` = `a`, `Internal (Expr a, Expr b)`
+= `(a,b)`. To explain the purpose of `proxyOf` and the first argument
+to `reconstruct` we will look at how `Compilable` is used.
+
+The function of `Compilable` are not used directly by the user of the
+library; instead they use the function `compileR`, which is defined
+like this:
+
+~~~
+compileR :: Compilable a => a -> Q Exp
+compileR a = [| reconstruct p $(translateComputable (compile a)) |]
+  where p = proxyOf a
+~~~
+
+As was explained in \ref{sec:th} `[| ... |]` is a quasi-quotation
+which is used here to generate a Template Haskell AST for an
+expression. First input is converted into a `Computable` which is
+passed to `translateComputable`, which does the actual compilation to
+a Template Haskell expression. This is spliced into the
+quasi-quotation as the second argument to `reconstruct`. The type of
+the spliced expression will be `Internal (GenTy a)`. `Internal` and
+`GenTy` are associated types which are not necessarily injective, so
+we can't know what `a` was if we only have `Internal (GenTy a)`, and
+there is no way to refer to the type variable `a` inside the
+quasi-quotation. This leads to a problem: the compiler doesn't know
+what instance to use for `reconstruct`. That is what the first
+argument is for. `Proxy` is a GADT which completely reifies the type
+of a `Compilable`. The reason that we pass a `Proxy a` and not simply
+an `a` is that we have to lift the arugment inside the
+quasi-quotation, which requires an instance of `Lift` for `a`. It's
+easier to write one instance of `Lift` for `Proxy` rather that one for
+every `Compilable` type. `Proxy` has one constructor for every
+`Compilable` instance declaration.
+
+To demonstrate how this works, we will look at two example instances
+of `Compilable`. For simplicity we will specialize the instances for
+2-dimensional arrays. In the following code names imported from Repa
+use the qualifier `R`. For example DIM2 is a rank-2 shape from
+meta-repa, R.DIM2 is a rank-2 shape from Repa. For these
+examples we assume the `Proxy` type has these two constructors:
+
+~~~
+  PManifest2 :: CProxy a -> PManifest2 (Manifest DIM2 a)
+  PManifestArg2 :: CProxy a -> Proxy r
+                -> PManifest2 (Manifest DIM2 a -> r)
+~~~
+
+`CProxy` is a GADT that describes the type of a `Computable`. That is,
+it is to `Computable` as `Proxy` is to `Compilable`. Values of
+`CProxy` are acquired with `cProxy`, which is part of the `Computable`
+class.
+
+
+~~~
+instance (Computable a ,Storable (Internal a)) =>
+    Compilable (Manifest DIM2 a)
+  where
+    type GenTy a =
+        (Expr (Vector (Internal a)), Expr Int, Expr Int)
+    type External a = R.Array R.U R.DIM2 (Internal a)
+    compile (Manifest vec (Z :. y :. x)) = (vec, y, x)
+    reconstruct _ (vec, y, x) =
+        R.fromUnboxed (R.Z R.:. y R.:. x) vec
+    proxyOf _ = PManifest2 cProxy
+~~~
+
+
+First, to represent the Manifest array and its dimensions in core
+language types we simply use a tuple of one vector and two `Int`s.
+The Haskell type we use to represent a manifest array with is the
+unboxed array representation from Repa. `compile` and `reconstruct`
+are straightforward. `reconstruct` doesn't need to inspect its first
+argument at all, it only has to have the correct type. It constructs
+the Repa array from the vector and the dimensions using `fromUnboxed`.
+
+This let's us compile a `Manifest DIM2 a`, but it doesn't let us
+compile functions, like `transposeP`. For this we need a second
+instance for functions with `Manifest DIM2 a` as its argument and any
+`Compilable` as return type.
+
+~~~
+instance (Computable a, Storable (Internal a), Compilable r)
+    => Compilable (Manifest DIM2 a -> r)
+  where
+    type GenTy a =
+        Expr (Vector (Internal a)) ->
+        Expr Int ->
+        Expr Int ->
+        GenTy r
+    type External a =
+        R.Array R.U R.DIM2 (Internal a) -> External r
+    compile f = \vec y x ->
+        compile (f (Manifest vec (Z :. y :. x)))
+    reconstruct (PManifestArg2 _ p) f = \uarr ->
+        let arr                 = R.toUnboxed uarr
+            (R.Z R.:. y R.:. x) = R.extent uarr
+        in reconstruct p (f arr y x)
+    proxyOf _ =
+        PManifestArg2
+          cProxy
+          (proxyOf (error "proxyOf evaluated its argument"))
+~~~
+
+We can pass a dummy argument to `proxyOf` since it shouldn't need to
+evaluate its argument.
+
+With these two instances we can compile functions of 2-dimensional
+Manifest arrays of any arity. Meta-repa has instances for `Expr`s,
+Manifest arrays and Pull arrays (which are represented externally
+using Repa's Delayed array representation).
 
 
