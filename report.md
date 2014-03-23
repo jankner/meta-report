@@ -104,10 +104,10 @@ what a deep embedding looks like:
 
 ~~~
 data Region 
-	= Circle Float
-	| Outside Region
-	| Union Region Region
-	| Intersect Region Region
+  = Circle Float
+  | Outside Region
+  | Union Region Region
+  | Intersect Region Region
 
 circle = Circle
 outside = Outside
@@ -492,7 +492,7 @@ product of two arrays, `arr1` and `arr2`. The arrays are defined as
 scalarProd a b = sumS (zipWith (*) a b)
 
 zipWith f (Pull ixf1 n1) (Pull ixf2 n2) =
-	Pull (\i -> ixf1 i `f` ixf2 i) (min n1 n2)
+  Pull (\i -> ixf1 i `f` ixf2 i) (min n1 n2)
 
 sumS (Pull ixf n) = forLoop n (\i s -> s + ixf i)
 ~~~
@@ -557,7 +557,7 @@ A splice can be said to allow the programmer to go from abstract
 syntax to concrete syntax. Template Haskell also has quasi-quotation
 which allows the programmer to go from concrete syntax to abstract
 syntax. Quasi-quotation is written as `[| ... |]` where `...` is
-a Haskell expression (in concrete syntax,) and the result is an AST of
+a Haskell expression (in concrete syntax), and the result is an AST of
 that expression. There is also quasi-quotations for declarations,
 types and patterns.
 
