@@ -4,14 +4,13 @@
 
 # Introduction
 
-Doing high-performance programming in Haskell can be a somewhat
-painful. Lazy evaluation and boxed representations are the default,
-and the overhead associated with this can be disastrous for
-performance in many cases. The programmer has to take steps to avoid
-laziness and to make sure that inlining of certain functions is
-performed in order to trigger certain optimization in GHC. This can
-be easy to get wrong, and can give rise to performance bugs that are
-hard to find and fix.
+Doing high-performance programming in Haskell can be somewhat painful.
+Lazy evaluation and boxed representations are the default, and the
+overhead associated with this can be disastrous for performance in
+many cases. The programmer has to take steps to avoid laziness and to
+make sure that inlining of certain functions is performed in order to
+trigger certain optimization in GHC. This can be easy to get wrong,
+and can give rise to performance bugs that are hard to find and fix.
 
 This thesis presents a new method for writing high-performance
 programs in Haskell based on embedded domain-specific lanaguages
@@ -388,7 +387,7 @@ representation is used to implement polymorphism and laziness. Since
 all boxed types are represented by a pointer to a heap object they all
 have a uniform representation and can be treated the same way to
 support polymorphism. The boxed representation is also indirect, which
-is used to support laziness. (..).
+is used to support laziness. 
 
 Unboxed types are simply represented by the value itself and are not
 stored on the heap. In GHC unboxed types, operations and values have a
@@ -550,7 +549,7 @@ Haskell and inserted using splices. For example, if we have
 a meta-repa program in one module:
 
 ~~~
-Expr Int -> Expr Int
+f :: Expr Int -> Expr Int
 f n = sumS (enumFromTo 1 n)
 ~~~
 
@@ -682,7 +681,7 @@ quasi-quotation. This leads to a problem: the compiler doesn't know
 what instance to use for `reconstruct`. That is what the first
 argument is for. `Proxy` is a GADT which completely reifies the type
 of a `Compilable`. The reason that we pass a `Proxy a` and not simply
-an `a` is that we have to lift the arugment inside the
+an `a` is that we have to lift the argument inside the
 quasi-quotation, which requires an instance of `Lift` for `a`. It's
 easier to write one instance of `Lift` for `Proxy` rather that one for
 every `Compilable` type. `Proxy` has one constructor for every
