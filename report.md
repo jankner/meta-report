@@ -134,7 +134,8 @@ other transformation.
 
 meta-repa uses both shallow and deep embedding. It has a core language
 that is deeply embedded. The arrays that users of the library use are a
-shallow embedding that is built on top of the core language.
+shallow embedding that is built on top of the core language. This is
+described in detail in \ref{sec:shallow}.
 
 ## High-performance programming in Haskell
 
