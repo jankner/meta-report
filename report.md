@@ -221,7 +221,13 @@ are quite easily solved. Also, in such a simple case GHC's strictness
 analyzer can see that the result of `sum'` is consumed immediately and
 automatically make the accumulator strict. But the strictness analysis
 is not guaranteed to work for every program, and for more complicated
-programs it gets easier to make mistakes.
+programs it gets easier to make mistakes. In meta-repa this kind of
+problem is avoided by making the core language strict. Laziness is
+a very useful feature of Haskell in general, but for the domain
+meta-repa is tailored to strictness is a better default. In general,
+with our EDSL approach we can give the programmer a set of efficiency
+guarantees that are easy to understand (see \ref{sec:contract} for
+meta-repa's guarantees).
 
 # Theory
 

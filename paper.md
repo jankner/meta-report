@@ -261,6 +261,7 @@ compiles into a Haskell function of type `Int -> Int -> Int`, which
 can now be used.
 
 ### Contract towards the programmer
+\label{sec:contract}
 
 The library meta-repa comes with a set of guarantees towards the
 programmer. These contracts helps the programmer understand the
