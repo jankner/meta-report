@@ -317,9 +317,9 @@ representation of the expression if the type checking succeeds.
 ## Higher-order abstract syntax
 
 Higher-order abstract syntax is a technique for representing bindings
-in the object language using function values in the abstract syntax.
+in the embedded language using function values in the abstract syntax.
 By doing this we reuse the notion of binding, variables and
-substitution of the meta-language instead of re-implementing them.
+substitution of the host language instead of re-implementing them.
 [@pfenning1988higher]
 
 As a motivating example we will see what happens when we try to extend
@@ -355,9 +355,9 @@ representation from the previous section looks like this:
   Val :: a -> Expr a
 ~~~
 
-Abstractions are represented by a function in the meta-language.
+Abstractions are represented by a function in the host language.
 Instead of having a variable constructor we use the variables of the
-meta-language. For example the expression `\x -> x + 10` is
+host language. For example the expression `\x -> x + 10` is
 represented like this:
 
 ~~~
