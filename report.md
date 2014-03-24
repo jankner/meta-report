@@ -582,8 +582,7 @@ to read and write. [@mainland2007quoted] Quasi-quotation is used in
 meta-repa to specify stencil computations.
 
 
-# Stuff
-\TODO{ think of a proper title}
+# Internals of meta-repa
 
 ## Manifest arrays
 
@@ -594,8 +593,7 @@ Push and Pull arrays which represent computations of arrays. This
 means that the computation of the Manifest array is not fused with
 any computation that done with it after.
 
-## Compiling things
-\TODO{ think of a proper title}
+## Compiling meta-repa programs
 
 As shown in \ref{sec:programming}, it is simple to use meta-repa
 functions work with types like `Float` and `Int` and tuples and flat
