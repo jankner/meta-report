@@ -46,9 +46,10 @@ often be more concise, easier to write and understand, and more
 efficient in their domain than a general purpose language. 
 
 An Embedded DSL (EDSL) is a DSL that is embedded into a general
-purpose language as a library. This saves us the work of designinging
-and implementing an entire language; we borrow much of the
-functionality (syntax, type system, etc.) from the host language.
+purpose language as a library. The language that the EDSL is embedded
+in is often called the *host language*. This saves us the work of
+designinging and implementing an entire language; we borrow much of
+the functionality (syntax, type system, etc.) from the host language.
 An EDSL can be divided into four sorts of constituent:
 
 * a set of types to represent concepts of the domain.
