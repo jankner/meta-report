@@ -580,7 +580,7 @@ a collection of functions that parses a string and generates a Haskell
 AST, which is inserted in place of the quasi-quotation. This allows
 for programmer-defined concrete syntax, which can make programs easier
 to read and write. [@mainland2007quoted] Quasi-quotation is used in
-meta-repa to specify stencil computations.
+meta-repa to specify stencil computations (see \ref{sec:stencil}).
 
 
 # Internals of meta-repa
