@@ -1,4 +1,4 @@
-report.pdf: report.tex
+report.pdf: report.tex cover.pdf meta.pdf
 	pdflatex report.tex
 	bibtex report.aux
 	pdflatex report.tex

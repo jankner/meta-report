@@ -1,4 +1,4 @@
-\documentclass[]{report}
+\documentclass[a4paper]{report}
 
 \usepackage{amsmath}
 \usepackage{array}
@@ -118,40 +118,27 @@ $endif$
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
-$if(numbersections)$
-$else$
-\setcounter{secnumdepth}{0}
-$endif$
-$if(verbatim-in-note)$
-\VerbatimFootnotes % allows verbatim text in footnotes
-$endif$
-$if(lang)$
-\ifxetex
-  \usepackage{polyglossia}
-  \setmainlanguage{$mainlang$}
-\else
-  \usepackage[$lang$]{babel}
-\fi
-$endif$
-$for(header-includes)$
-$header-includes$
-$endfor$
 
-$if(title)$
-\title{$title$}
-$endif$
-\author{$for(author)$$author$$sep$ \and $endfor$}
-\date{$date$}
+%$if(title)$
+%\title{$title$}
+%$endif$
+%\author{$for(author)$$author$$sep$ \and $endfor$}
+%\date{$date$}
+
+\usepackage{pdfpages}
 
 \begin{document}
-$if(title)$
-\maketitle
-$endif$
+\begin{titlepage}
 
-$for(include-before)$
-$include-before$
+\includepdf[fitpaper=true,pages={1}]{cover.pdf}
 
-$endfor$
+\end{titlepage}
+%$if(title)$
+%\maketitle
+%$endif$
+
+\includepdf[fitpaper=true,pages={2}]{cover.pdf}
+
 $if(toc)$
 {
 \hypersetup{linkcolor=black}
