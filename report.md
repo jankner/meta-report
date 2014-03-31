@@ -35,7 +35,7 @@ up appendix A.
 ## Embedded Domain-Specific Languages
 
 A Domain-Specific Language (DSL) is a language that is focused on
-solving problems in particular domain. Some examples of well-known
+solving problems in a particular domain. Some examples of well-known
 DSLs are: SQL for relational database queries, VHDL and Verilog for
 hardware design, TeX for for typesetting.
 
@@ -641,8 +641,6 @@ class Computable (GenTy a) => Compilable a where
   reconstruct :: Proxy a -> Internal (GenTy a) -> External a
   proxyOf :: a -> Proxy a
 ~~~
-
-Computable value -> `compile` -> Computable value -> `translateComputable` -> TH expression -> splice -> `reconstruct` -> External representation
 
 The associated type `GenTy a` gives the type `a` gets converted into.
 The associated type `External a` is the external Haskell type that `a`
