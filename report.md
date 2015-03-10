@@ -450,8 +450,9 @@ constructs one list with the elements `(n+1)*2` for n 1 to
 
 ~~~
 l = f 1
-  where f n | n > 100   = []
-            | otherwise = ((n+1)*2) : f (n-1)
+  where
+		f n | n > 100   = []
+        | otherwise = ((n+1)*2) : f (n-1)
 ~~~
 
 But this is considerably less concise and readable. We would like to
