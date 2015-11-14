@@ -16,8 +16,8 @@ This thesis presents a new method for writing high-performance
 programs in Haskell based on embedded domain-specific lanaguages
 (EDSLs) and meta-programming. Programs are written in an embedded
 language that is translated into Haskell code at compile-time. The
-code generation is done in a way to give efficiency guarantees for
-programs written in the EDSL.
+code generation is done in such a way to give efficiency guarantees
+for programs written in the EDSL.
 
 The thesis also presents a case study to demonstrate the viability of
 the method. The case study is a library for parallell array
@@ -131,7 +131,7 @@ Shallow embeddings are simpler and more efficient than deep
 embeddings, so it's a good choice if there is an obvious semantics for
 the language. The advantage to using a deep embedding is that it's
 easier to add run functions to and language and to do optimizations or
-other transformation.
+other transformations.
 
 meta-repa uses both shallow and deep embedding. It has a core language
 that is deeply embedded. The arrays that users of the library use are a
@@ -260,7 +260,9 @@ evaluation function.
 But what should our evalution function return if, for example, we try
 to add a boolean expression with a integer expression? We need to be
 able to represent errors in the return type, so we change it to `Maybe
-(Either Int Bool)`.
+(Either Int Bool)`. This also makes evaluation more complicated
+and less efficient since we have to check for type errors at every
+step.
 
 This will work, but we only know at runtime what type the result of an
 expression will be and we need to handle runtime type errors in the
@@ -270,7 +272,7 @@ GADTs allows us to use Haskell's type system to do just that.
 
 GADTs let us give custom types to the constructors of our type. This
 allows us to express the typing rules of the embedded language in the
-Haskell's type system. Haskell's type checker will then disallow any
+Haskell's type system. Haskell's type checker will then reject any
 program that might result in a badly typed term of the embedded
 language.
 
@@ -657,13 +659,13 @@ compile this into Haskell we get a function with the type `(Vector
 Float, Int, Int) -> (Vector Float, Int, Int)`, which is less than
 ideal. It would be nice if we could also wrap it into a more
 meaningful type. Repa's unboxed array type `Array U` fits well for
-this job as it uses `Vector` internally. Of course we alo want to do
-all this converting and wrapping automatically and hide it behind
-a simple interface. `Computable` can't do the work of wrapping the
+this job as it uses `Vector` internally. Of course we also want to do
+all this converting and wrapping automatically and hide it behind a
+simple interface. `Computable` can't do the work of wrapping the
 compiled program, so we will solve the problem with a new type class
-called `Compilable`. The class will need one function that converts
-a value of the type into a `Computable`. It will also need a function
-to wrap the compiled value.
+called `Compilable`. The class will need one function that converts a
+value of the type into a `Computable`. It will also need a function to
+wrap the compiled value.
 
 ~~~
 class Computable (GenTy a) => Compilable a where
@@ -699,7 +701,7 @@ compileR a = [| reconstruct p $(translateComputable (compile a)) |]
 
 As was explained in \ref{sec:th} `[| ... |]` is a quasi-quotation
 which is used here to generate a Template Haskell AST for an
-expression. First input is converted into a `Computable` which is
+expression. First, input is converted into a `Computable` which is
 passed to `translateComputable`, which does the actual compilation to
 a Template Haskell expression. This is spliced into the
 quasi-quotation as the second argument to `reconstruct`. The type of
@@ -733,7 +735,7 @@ examples we assume the `Proxy` type has these two constructors:
 ~~~
 
 `CProxy` is a GADT that describes the type of a `Computable`. That is,
-it is to `Computable` as `Proxy` is to `Compilable`. Values of
+`CProxy` is to `Computable` as `Proxy` is to `Compilable`. Values of
 `CProxy` are acquired with `cProxy`, which is part of the `Computable`
 class.
 
