@@ -236,10 +236,10 @@ meta-repa's guarantees).
 ## Generalized algebraic data types
 
 Types declared using the keyword `data` in Haskell are known as
-algebraic data types (ADTs). Generalized algebraic data types (GADTs) is an
-extension to ADTs which allows the programmer to specify the type of
-the constructs of the constructors of the type. This sections explains
-how this is useful when defining EDSLs.
+algebraic data types (ADTs). Generalized algebraic data types (GADTs)
+is an extension to ADTs which allows the programmer to specify the
+type of the constructors of the type. This sections explains how this
+is useful when defining EDSLs.
 
 Consider a simple embedded language which has booleans and integers,
 addition of integers and `if`s. In Haskell we can represent the
@@ -422,9 +422,10 @@ primitive types and tuples in the meta-repa code generator. For this
 reason the semantics of the core language is strict since unboxed
 values are strict. Also, terms in the language are monomorphic;
 unboxed values do not support polymorphism. Note that we can still
-write polymorphic code generators in Haskell, so we can still write
-polymorpic with meta-repa. This is similar to how templates work in
-C++; the polymorpism only exists at compile-time.
+write polymorphic code generators in Haskell. So we can still write
+polymorpic functions and programs with meta-repa, which generate
+monomorphic core language terms. This is similar to how templates work
+in C++; the polymorpism only exists at compile-time.
 
 ## Fusion
 
@@ -476,11 +477,31 @@ rewriting the combination of two pre-define functions: `build` and
 that one transformation is enough to remove all intermediate lists,
 though of course not all programs can be written in this way.
 
-In meta-repa fusion is not an optimization that is performed as a
-program transformation. Rather, the array representations and
-combinators in the library are defined so that no unnecessary
-intermediate arrays are created to begin with.  For example, Pull
-arrays are represented as a function from an index to a value.
+Since meta-repa is an EDSL for array computations, those are the
+computations we are concerned abot fusing.  In meta-repa fusion is not
+an optimization that is performed as a program transformation. Rather,
+the array representations and combinators in the library are defined
+so that no unnecessary intermediate arrays are created to begin with.
+For example, Pull arrays are represented as a function from an index
+to a value.
+
+~~~
+data Pull sh a = Pull (Shape sh -> a) (Shape sh)
+~~~
+
+The first argument to the `Pull` constructor is the indexing function
+and the second argument is the size, or *extent*, of the array.
+`Shape` is a type that represents indices of any dimensionality,
+depending on its argument. Using `Shape` indices of any dimensionality
+can be handled polymorphically. For the sake of simplicity and shorter
+code examples, the rest of this section uses an alternative definition
+of `Pull` where indices are simply an `Int`, so that it is specialized
+for for one-dimensional arrays:
+
+~~~
+data Pull a = Pull (Int -> a) Int
+~~~
+
 Combinators on Pull arrays combine the indexing functions and other
 function. For example the `map` function on Pull arrays combines the
 indexing function of the input with the function to map with: 
@@ -544,7 +565,7 @@ expression that generates an AST. The expression is evaluated by the
 compiler while it is compiling the module. Because it is evaluated at
 compile-time any functions used in the expression must be defined in
 a seperate module, so that it can be compiled before the current
-module. Splices can be occur in place of an expression, a type or
+module. Splices can occur in place of an expression, a type or
 a list of top-level declarations.
 
 The meta-repa core language is translated into Haskell using Template
@@ -588,12 +609,22 @@ meta-repa to specify stencil computations (see \ref{sec:stencil}).
 
 ## Manifest arrays
 
-Manifest arrays are on of the array types in meta-repa. They are not
+Manifest arrays are one of the array types in meta-repa. They are not
 described in the article, so I will describe them briefly here.
 Manifest arrays represent arrays that are stored in memory, unlike
 Push and Pull arrays which represent computations of arrays. This
-means that the computation of the Manifest array is not fused with
-any computation that done with it after.
+means that the computation of the Manifest array is not fused with any
+computation that is done with it after.
+
+~~~
+data Manifest sh a = Computable a => Manifest (Expr (IArray (Internal a))) (Shape sh)
+~~~
+
+`IArray` is the type of immutable arrays in the core language. The
+`Computable` constraint on the constructor is needed to get access to
+the associated type `Internal` in order to know how to represent `a`
+in the core language. `Computable` and `Internal` is described in the
+next section.
 
 ## Compiling meta-repa programs
 
@@ -656,7 +687,7 @@ example, `Internal (Expr a)` = `a`, `Internal (Expr a, Expr b)`
 = `(a,b)`. To explain the purpose of `proxyOf` and the first argument
 to `reconstruct` we will look at how `Compilable` is used.
 
-The function of `Compilable` are not used directly by the user of the
+The functions in `Compilable` are not used directly by the user of the
 library; instead they use the function `compileR`, which is defined
 like this:
 
@@ -679,12 +710,14 @@ there is no way to refer to the type variable `a` inside the
 quasi-quotation. This leads to a problem: the compiler doesn't know
 what instance to use for `reconstruct`. That is what the first
 argument is for. `Proxy` is a GADT which completely reifies the type
-of a `Compilable`. The reason that we pass a `Proxy a` and not simply
-an `a` is that we have to lift the argument inside the
-quasi-quotation, which requires an instance of `Lift` for `a`. It's
-easier to write one instance of `Lift` for `Proxy` rather that one for
-every `Compilable` type. `Proxy` has one constructor for every
-`Compilable` instance declaration.
+of a `Compilable`. In order to pass the `Proxy` value into the
+quasi-quotation, it has to be converted into a Template Haskell AST.
+Template Haskell does this by using the type class `Lift`, which
+contains a function `lift` that takes a value and converts it into an
+AST. This is the reason we pass in a value of `Proxy a` rather than
+simply `a`; it is easier to write one instance of `Lift` for `Proxy`
+rather that one for every `Compilable` type. `Proxy` has one
+constructor for every `Compilable` instance declaration.
 
 To demonstrate how this works, we will look at two example instances
 of `Compilable`. For simplicity we will specialize the instances for
@@ -727,7 +760,7 @@ are straightforward. `reconstruct` doesn't need to inspect its first
 argument at all, it only has to have the correct type. It constructs
 the Repa array from the vector and the dimensions using `fromUnboxed`.
 
-This let's us compile a `Manifest DIM2 a`, but it doesn't let us
+This lets us compile a `Manifest DIM2 a`, but it doesn't let us
 compile functions, like `transposeP`. For this we need a second
 instance for functions with `Manifest DIM2 a` as its argument and any
 `Compilable` as return type.
