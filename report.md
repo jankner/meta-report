@@ -130,7 +130,7 @@ in the run function.
 Shallow embeddings are simpler and more efficient than deep
 embeddings, so it's a good choice if there is an obvious semantics for
 the language. The advantage to using a deep embedding is that it's
-easier to add run functions to and language and to do optimizations or
+easier to add run functions to the language and to do optimizations or
 other transformations.
 
 meta-repa uses both shallow and deep embedding. It has a core language
